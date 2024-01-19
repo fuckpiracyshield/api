@@ -1,58 +1,49 @@
 from piracyshield_component.log.logger import Logger
 from piracyshield_component.exception import ApplicationException
-
 from .response import ResponseHandler
 
-import tornado.web
 import time
+from collections import deque
+from tornado.locks import Lock
+
+from interceptors.logger import LoggerInterceptor
+from interceptors.security.blacklist import BlacklistInterceptor
+from interceptors.security.rate_limit import RateLimitInterceptor
+
+from ioutils.errors import ErrorCode, ErrorMessage
 
 class RequestHandler(ResponseHandler):
 
     """
     Requests gateway.
+
+    The requestor gets blocked here before proceding any further.
+    Interceptors are implemented to allow certain features to take part of the action.
+
+    Current actived interceptors:
+      - security: takes care of the IP addresses exceeding limits (ex. applies the ban rules when triggered).
+      - rate limit: the IP will get a 429 when trying to perform too many requests on a given timeframe.
     """
 
-    # override the default methods
-    SUPPORTED_METHODS = ("GET", "POST")
+    interceptors = [
+        LoggerInterceptor,
+        BlacklistInterceptor,
+        RateLimitInterceptor
+    ]
 
-    # max requests allowed in a second
-    MAX_REQUESTS_PER_SECOND = 100
+    async def prepare(self):
+        await self.run_interceptors()
 
-    # requests container
-    REQUESTS = {}
+    async def run_interceptors(self):
+        for interceptor in self.interceptors:
+            try:
+                await interceptor().execute(self)
 
-    def prepare(self) -> None:
-        """
-        Handles the request general procedures.
-        This method implements a very simple request limit check.
-        """
-
-        self.application.logger.debug(f'> GET `{self.request.uri}` from `{self.request.remote_ip}`')
-
-        # get the current timestamp in seconds
-        timestamp = int(time.time())
-
-        # TODO: this should be better handled and also provide a way to temporary ban each IP when flooding.
-
-        # check if the number of requests for this second has exceeded the limit
-        if timestamp in self.REQUESTS:
-            if self.REQUESTS[timestamp] >= self.MAX_REQUESTS_PER_SECOND:
-                self.error(status_code = 429, error_code = ErrorCode.TOO_MANY_REQUESTS, message = ErrorMessage.TOO_MANY_REQUESTS)
+            except Exception as InterceptorException:
+                self.error(
+                    status_code = InterceptorException.status_code,
+                    error_code = InterceptorException.error_code,
+                    message = InterceptorException.error_message
+                )
 
                 return
-
-        # increment the number of requests for this second
-        self.REQUESTS[timestamp] = self.REQUESTS.get(timestamp, 0) + 1
-
-        # decrement the number of requests after one second
-        tornado.ioloop.IOLoop.current().call_later(1.0, self._decrement_requests_count, timestamp)
-
-    def _decrement_requests_count(self, timestamp):
-        """
-        Decrement the requests count per timestamp.
-
-        :param timestamp: current timestamp.
-        """
-
-        if timestamp in self.REQUESTS:
-            self.REQUESTS[timestamp] -= 1

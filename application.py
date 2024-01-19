@@ -11,7 +11,13 @@ class Application(tornado.web.Application):
     Application initializer.
     """
 
-    def __init__(self, debug: bool, handlers: list, version: str, prefix: str, cookie_secret: str, cache_path: str):
+    domain = 'localhost'
+
+    allowed_methods = 'POST, GET'
+
+    max_age = 3600
+
+    def __init__(self, debug: bool, domain: str, handlers: list, version: str, prefix: str, cookie_secret: str, cache_path: str):
         """
         This is a list of handlers that directly extend the RequestHandler class, instead of relying on a BaseHandler class.
 
@@ -22,6 +28,9 @@ class Application(tornado.web.Application):
         :param cache_path: folder for cache uploads.
         :return: a list of routes and their handlers.
         """
+
+        if domain:
+            self.domain = domain
 
         if prefix:
             version = f'{prefix}/{version}'

@@ -1,2 +1,2 @@
-tornado
+tornado ~= 6.3.3
 pytest

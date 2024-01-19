@@ -7,12 +7,16 @@ from v1.routes import APIv1
 
 from application import Application
 
-api_config = Config('api').get('general')
+application_config = Config('application').get('general')
+api_config = Config('application').get('api')
 
 if __name__ == "__main__":
     app = Application(
         # wether to run the application using debug mode
         debug = api_config['debug'],
+
+        # useful for CORS settings
+        domain = application_config['domain'],
 
         # load current routes
         handlers = APIv1.routes,

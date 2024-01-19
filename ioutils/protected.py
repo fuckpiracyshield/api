@@ -27,10 +27,10 @@ class ProtectedHandler(BaseHandler):
 
     account_data = {}
 
-    def prepare(self):
+    async def prepare(self):
         self.authentication_verify_access_token_service = AuthenticationVerifyAccessTokenService()
 
-        super().prepare()
+        await super().prepare()
 
     def initialize_account(self):
         """

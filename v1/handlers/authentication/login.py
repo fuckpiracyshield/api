@@ -40,7 +40,8 @@ class AuthenticationLoginHandler(BaseHandler):
                 None,
                 self.process,
                 self.request_data.get('email'),
-                self.request_data.get('password')
+                self.request_data.get('password'),
+                self.request.remote_ip
             )
 
             self.success(data = {
@@ -51,13 +52,14 @@ class AuthenticationLoginHandler(BaseHandler):
         except ApplicationException as e:
             self.error(status_code = 400, error_code = e.code, message = e.message)
 
-    def process(self, email: str, password: str) -> tuple:
+    def process(self, email: str, password: str, ip_address: str) -> tuple:
         authentication_authenticate_service = AuthenticationAuthenticateService()
 
         # try to authenticate
         payload = authentication_authenticate_service.execute(
             email = email,
-            password = password
+            password = password,
+            ip_address = ip_address
         )
 
         authentication_generate_access_token_service = AuthenticationGenerateAccessTokenService()

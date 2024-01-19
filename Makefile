@@ -34,4 +34,4 @@ sast:
 bench:
 	@echo "Running benchmark"
 	ab -v 2 -n 20 -c 10 -k -T application/json -p tests/bench_params.txt 127.0.0.1:58008/api/v1/authentication/login
-	#ab -v 2 -n 20 -c 10 -k 127.0.0.1:58008/api/v1/ping
+	#ab -v 2 -n 200 -c 10 -k 127.0.0.1:58008/api/v1/ping

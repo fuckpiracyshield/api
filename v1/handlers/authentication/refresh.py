@@ -36,7 +36,7 @@ class AuthenticationRefreshHandler(BaseHandler):
                 return
 
             if not self.request_data.get('refresh_token'):
-                return self.error(status_code = 403, error_code = ErrorCode.MISSING_REFRESH_TOKEN, message = ErrorMessage.MISSING_REFRESH_TOKEN)
+                return self.error(status_code = 401, error_code = ErrorCode.MISSING_REFRESH_TOKEN, message = ErrorMessage.MISSING_REFRESH_TOKEN)
 
             refresh_token = self.request_data.get('refresh_token')
 

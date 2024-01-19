@@ -31,9 +31,9 @@ class ErrorCode:
 
     MISSING_FILE = '1012'
 
-    NO_DATA_AVAILABLE = '1013'
+    CHANGE_PASSWORD = '1013'
 
-    CHANGE_PASSWORD = '1014'
+    IP_ADDRESS_BLACKLISTED = '1014'
 
 class ErrorMessage:
 
@@ -75,8 +75,8 @@ class ErrorMessage:
 
     MISSING_FILE = 'Missing required file.'
 
-    NO_DATA_AVAILABLE = 'No data available for this request.'
-
     # account settings
 
     CHANGE_PASSWORD = 'A password change has been activated for your account. You must first authenticate via web app and follow the instructions.'
+
+    IP_ADDRESS_BLACKLISTED = 'Your IP address is temporary blacklisted.'

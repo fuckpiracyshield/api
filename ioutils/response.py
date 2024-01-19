@@ -1,14 +1,17 @@
-import tornado.web
+from tornado.web import RequestHandler
+
+from piracyshield_component.config import Config
 
 from .errors import ErrorCode, ErrorMessage
 
-import datetime
 import json
 
-class ResponseHandler(tornado.web.RequestHandler):
+class ResponseHandler(RequestHandler):
 
     """
     Response handler.
+
+    Prepares the response parameters for the next layer (Request).
     """
 
     def set_default_headers(self) -> None:
@@ -16,11 +19,12 @@ class ResponseHandler(tornado.web.RequestHandler):
         Sets the default headers.
         """
 
-        self.set_header('Access-Control-Allow-Origin', '*')
+        # allow CORS only from current domain
+        self.set_header('Access-Control-Allow-Origin', self.application.domain)
 
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET')
+        self.set_header('Access-Control-Allow-Methods', self.application.allowed_methods)
 
-        self.set_header('Access-Control-Max-Age', 3600)
+        self.set_header('Access-Control-Max-Age', self.application.max_age)
 
         # response for this API is always a JSON
         self.set_header('Content-Type', 'application/json')
@@ -44,8 +48,8 @@ class ResponseHandler(tornado.web.RequestHandler):
             value = value,
             expires_days = 1,
             httponly = True,
-            samesite = "Strict"
-            # secure = True
+            samesite = "Strict",
+            secure = True
         )
 
     def get_refresh_cookie(self) -> any:
@@ -106,8 +110,9 @@ class ResponseHandler(tornado.web.RequestHandler):
             'status': 'success'
         }
 
-        # this will return empty data as well
-        response['data'] = data
+        # ensures these data are appended in any case, even if empty
+        if isinstance(data, str) or isinstance(data, list) or isinstance(data, dict):
+            response['data'] = data
 
         # generic purpose informations that we want to communicate
         if note:
