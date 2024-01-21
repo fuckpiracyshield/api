@@ -23,17 +23,19 @@ class ErrorCode:
 
     TOKEN_FORMAT_NON_VALID = '1008'
 
-    NON_VALID_PARAMETERS = '1009'
+    TOKEN_EXPIRED = '1009'
 
-    MISSING_PARAMETERS = '1010'
+    NON_VALID_PARAMETERS = '1010'
 
-    TOO_MANY_PARAMETERS = '1011'
+    MISSING_PARAMETERS = '1011'
 
-    MISSING_FILE = '1012'
+    TOO_MANY_PARAMETERS = '1012'
 
-    CHANGE_PASSWORD = '1013'
+    MISSING_FILE = '1013'
 
-    IP_ADDRESS_BLACKLISTED = '1014'
+    CHANGE_PASSWORD = '1014'
+
+    IP_ADDRESS_BLACKLISTED = '1015'
 
 class ErrorMessage:
 
@@ -63,6 +65,8 @@ class ErrorMessage:
 
     TOKEN_FORMAT_NON_VALID = 'Token format non valid.'
 
+    TOKEN_EXPIRED = 'This token is expired.'
+
     # json POST parameters
 
     NON_VALID_PARAMETERS = 'Expecting JSON data.'
@@ -77,6 +81,6 @@ class ErrorMessage:
 
     # account settings
 
-    CHANGE_PASSWORD = 'A password change has been activated for your account. You must first authenticate via web app and follow the instructions.'
+    CHANGE_PASSWORD = 'A password change has been activated for your account. You must authenticate via web interface and follow the instructions. You should now discard this tokens pairs.'
 
     IP_ADDRESS_BLACKLISTED = 'Your IP address is temporary blacklisted.'

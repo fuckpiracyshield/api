@@ -2,6 +2,8 @@ from .base import BaseHandler
 
 from piracyshield_component.exception import ApplicationException
 
+from piracyshield_service.security.blacklist.exists_by_access_token import SecurityBlacklistExistsByAccessTokenService
+
 from piracyshield_service.authentication.verify_access_token import AuthenticationVerifyAccessTokenService
 
 from piracyshield_service.permission.service import PermissionService
@@ -28,6 +30,8 @@ class ProtectedHandler(BaseHandler):
     account_data = {}
 
     async def prepare(self):
+        self.security_blacklist_exists_by_access_token_service = SecurityBlacklistExistsByAccessTokenService()
+
         self.authentication_verify_access_token_service = AuthenticationVerifyAccessTokenService()
 
         await super().prepare()
@@ -52,12 +56,19 @@ class ProtectedHandler(BaseHandler):
             return False
 
         # get the token only
-        token = authorization_header[7:]
+        self.current_access_token = authorization_header[7:]
 
         try:
+            if self.security_blacklist_exists_by_access_token_service.execute(
+                access_token = self.current_access_token
+            ) == True:
+                self.error(status_code = 401, error_code = ErrorCode.TOKEN_EXPIRED, message = ErrorMessage.TOKEN_EXPIRED)
+
+                return False
+
             # set the current account data
             # TODO: absolutely need to validate the payload.
-            self.account_data = self.authentication_verify_access_token_service.execute(token)
+            self.account_data = self.authentication_verify_access_token_service.execute(self.current_access_token)
 
             if not self.account_data.get('email'):
                 self.error(status_code = 401, error_code = ErrorCode.TOKEN_FORMAT_NON_VALID, message = ErrorMessage.TOKEN_FORMAT_NON_VALID)

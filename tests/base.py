@@ -4,9 +4,10 @@ import pytest
 import os
 import requests
 
-application_config = Config('api').get('general')
+application_config = Config('application').get('general')
+api_config = Config('application').get('api')
 
-URL = f"http://127.0.0.1:{application_config['port']}"
+URL = f"{application_config.get('domain')}:{api_config.get('port')}"
 
 def get_request(endpoint: str):
     return requests.get(f'{URL}{endpoint}')

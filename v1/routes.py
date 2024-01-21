@@ -31,6 +31,8 @@ from .handlers.account.provider.set_status import SetStatusActiveProviderAccount
 from .handlers.account.provider.change_password import ChangePasswordProviderAccountHandler
 from .handlers.account.provider.remove import RemoveProviderAccountHandler
 
+from .handlers.account.session.get_all import GetAllSessionAccountHandler
+
 from .handlers.ticket.create import CreateTicketHandler
 from .handlers.ticket.get import GetTicketHandler
 from .handlers.ticket.get_all import GetAllTicketHandler
@@ -138,6 +140,9 @@ class APIv1:
         (r"/account/provider/set/status/non_active", SetStatusNonActiveProviderAccountHandler),
         (r"/account/provider/change_password", ChangePasswordProviderAccountHandler),
         (r"/account/provider/remove", RemoveProviderAccountHandler),
+
+        # sessions
+        (r"/account/session/get/all", GetAllSessionAccountHandler),
 
         # blocking ticket management
         (r"/ticket/create", CreateTicketHandler),

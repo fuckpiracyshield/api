@@ -10,8 +10,9 @@ import tornado
 from ioutils.base import BaseHandler
 from ioutils.errors import ErrorCode, ErrorMessage
 
-from piracyshield_service.authentication.verify_refresh_token import AuthenticationVerifyRefreshTokenService
-from piracyshield_service.authentication.generate_access_token import AuthenticationGenerateAccessTokenService
+from piracyshield_service.security.blacklist.exists_by_refresh_token import SecurityBlacklistExistsByRefreshTokenService
+
+from piracyshield_service.authentication.refresh_access_token import AuthenticationRefreshAccessTokenService
 
 from piracyshield_component.exception import ApplicationException
 
@@ -41,10 +42,22 @@ class AuthenticationRefreshHandler(BaseHandler):
             refresh_token = self.request_data.get('refresh_token')
 
         try:
+            security_blacklist_exists_by_refresh_token_service = SecurityBlacklistExistsByRefreshTokenService()
+
+            if security_blacklist_exists_by_refresh_token_service.execute(
+                refresh_token = refresh_token
+            ) == True:
+                self.error(status_code = 401, error_code = ErrorCode.TOKEN_EXPIRED, message = ErrorMessage.TOKEN_EXPIRED)
+
+                return False
+
+            authentication_refresh_access_token_service = AuthenticationRefreshAccessTokenService()
+
             access_token = await tornado.ioloop.IOLoop.current().run_in_executor(
                 None,
-                self.process,
-                refresh_token
+                authentication_refresh_access_token_service.execute,
+                refresh_token,
+                self.request.remote_ip
             )
 
             # return the access_token
@@ -54,18 +67,3 @@ class AuthenticationRefreshHandler(BaseHandler):
 
         except ApplicationException as e:
             self.error(status_code = 400, error_code = e.code, message = e.message)
-
-    def process(self, refresh_token: str) -> str:
-        authentication_verify_refresh_token_service = AuthenticationVerifyRefreshTokenService()
-
-        # verify the token and unwrap the payload
-        payload = authentication_verify_refresh_token_service.execute(
-            token = refresh_token
-        )
-
-        authentication_generate_access_token_service = AuthenticationGenerateAccessTokenService()
-
-        # generate a new access token
-        access_token = authentication_generate_access_token_service.execute(payload)
-
-        return access_token
