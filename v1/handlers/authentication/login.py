@@ -41,7 +41,7 @@ class AuthenticationLoginHandler(BaseHandler):
                 authentication_authenticate_service.execute,
                 self.request_data.get('email'),
                 self.request_data.get('password'),
-                self.request.remote_ip
+                self.ip_address
             )
 
             # store the refresh token in a http-only secure cookie

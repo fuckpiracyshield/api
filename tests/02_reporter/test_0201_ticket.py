@@ -15,14 +15,14 @@ class TestReporterCreateTicket:
     ticket_wait_time = 76
 
     ticket_parameters = {
-        'dda_id': '002ad48ea02a43db9003b4f15f1da9b3',
+        'dda_id': '7b3d774097ca477687f29ad0968833ac',
         'description': '__MOCK_TICKET__',
         'forensic_evidence': {
             'hash': {}
         },
         'fqdn': [
             'mock-website.com',
-            'google.com'
+            'mock-website-two.com'
         ],
         'ipv4': [
             '9.8.7.6',
@@ -43,8 +43,6 @@ class TestReporterCreateTicket:
         }
 
         create_response = authenticated_post_request('/api/v1/ticket/create', self.access_token, self.ticket_parameters)
-
-        print(" RES -> ", create_response.json())
 
         assert create_response.status_code == 200
         assert create_response.json()['status'] == 'success'

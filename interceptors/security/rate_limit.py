@@ -14,7 +14,7 @@ class RateLimitInterceptor:
     SUPPORTED_METHODS = ("GET", "POST")
 
     # max requests allowed in a second
-    MAX_REQUESTS_PER_SECOND = 100
+    MAX_REQUESTS_PER_SECOND = 1000
 
     # requests container
     REQUESTS = {}

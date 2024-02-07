@@ -87,6 +87,7 @@ from .handlers.whitelist.set_status import SetStatusActiveWhitelistItemHandler, 
 from .handlers.whitelist.remove import RemoveWhitelistItemHandler
 
 from .handlers.dda.create import CreateDDAHandler
+from .handlers.dda.get_by_identifier import GetByIdentifierDDAHandler
 from .handlers.dda.get_all import GetAllDDAHandler
 from .handlers.dda.get_all_by_account import GetAllByAccountDDAHandler
 from .handlers.dda.get_global import GetGlobalDDAHandler
@@ -212,6 +213,7 @@ class APIv1:
 
         # DDA management
         (r"/dda/create", CreateDDAHandler),
+        (r"/dda/get", GetByIdentifierDDAHandler),
         (r"/dda/get/all", GetAllDDAHandler),
         (r"/dda/get/all/by_account", GetAllByAccountDDAHandler),
         (r"/dda/get/global", GetGlobalDDAHandler),

@@ -7,7 +7,7 @@ class LoggerInterceptor:
     """
 
     async def execute(self, r):
-        r.application.logger.debug(f'> GET `{r.request.uri}` from `{r.request.remote_ip}`')
+        r.application.logger.debug(f'> GET `{r.request.uri}` from `{r.ip_address}`')
 
 class LoggerInterceptorException(Exception):
 

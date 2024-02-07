@@ -30,6 +30,15 @@ class TestProviderSetTicketItems:
         assert response.status_code == 200
         assert response.json()['status'] == 'success'
 
+    def test_set_unprocessed_fqdn(self):
+        response = authenticated_post_request('/api/v1/ticket/item/set/unprocessed', self.access_token, {
+            'value': 'mock-website-two.com',
+            'reason': 'ALREADY_BLOCKED'
+        })
+
+        assert response.status_code == 200
+        assert response.json()['status'] == 'success'
+
     def test_set_processed_ipv4(self):
         response = authenticated_post_request('/api/v1/ticket/item/set/processed', self.access_token, {
             'value': '9.8.7.6'

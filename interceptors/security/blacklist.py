@@ -13,10 +13,12 @@ class BlacklistInterceptor:
     async def execute(self, r):
         await self._prepare_modules()
 
-        if self.security_blacklist_exists_by_ip_address_service.execute(
-            ip_address = r.request.remote_ip
-        ) == True:
-            raise BlacklistInterceptorException()
+        # if we have a valid IP address, let's check if it has been blacklisted
+        if r.ip_address:
+            if self.security_blacklist_exists_by_ip_address_service.execute(
+                ip_address = r.ip_address
+            ) == True:
+                raise BlacklistInterceptorException()
 
     async def _prepare_modules(self):
         self.security_blacklist_exists_by_ip_address_service = SecurityBlacklistExistsByIPAddressService()

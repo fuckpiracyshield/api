@@ -52,23 +52,47 @@ class CreateTicketHandler(ProtectedHandler):
 
             ticket_create_service = TicketCreateService()
 
-            ticket_id, revoke_time = await tornado.ioloop.IOLoop.current().run_in_executor(
-                None,
-                ticket_create_service.execute,
-                self.request_data.get('dda_id'),
-                self.request_data.get('forensic_evidence'),
-                self.request_data.get('fqdn') or [],
-                self.request_data.get('ipv4') or [],
-                self.request_data.get('ipv6') or [],
-                self.request_data.get('assigned_to') or [],
-                self.account_data.get('account_id'),
-                self.request_data.get('description') or None
-            )
+            if self.account_data.get('role') == AccountRoleModel.INTERNAL.value:
+                ticket_id, revoke_time = await tornado.ioloop.IOLoop.current().run_in_executor(
+                    None,
+                    ticket_create_service.execute,
+                    self.request_data.get('dda_id'),
+                    self.request_data.get('forensic_evidence'),
+                    self.request_data.get('fqdn') or [],
+                    self.request_data.get('ipv4') or [],
+                    self.request_data.get('ipv6') or [],
+                    self.request_data.get('assigned_to') or [],
+                    self.account_data.get('account_id'),
+                    self.request_data.get('description') or None
+                )
 
-            self.success(
-                data = { 'ticket_id': ticket_id },
-                note = f'Ticket created. If this is a mistake, you have {revoke_time} seconds to remove it before it gets visible to the providers.'
-            )
+                self.success(
+                    data = { 'ticket_id': ticket_id },
+                    note = f'Ticket created. If this is a mistake, you have {revoke_time} seconds to remove it before it gets visible to the providers.'
+                )
+
+            elif self.account_data.get('role') == AccountRoleModel.REPORTER.value:
+                ticket_id, revoke_time = await tornado.ioloop.IOLoop.current().run_in_executor(
+                    None,
+                    ticket_create_service.execute,
+                    self.request_data.get('dda_id'),
+                    self.request_data.get('forensic_evidence'),
+                    self.request_data.get('fqdn') or [],
+                    self.request_data.get('ipv4') or [],
+                    self.request_data.get('ipv6') or [],
+                    self.request_data.get('assigned_to') or [], # TEMPORARY
+                    #[], # currently, we do not allow any choice by the reporter to which provider will receive the ticket
+                    self.account_data.get('account_id'),
+                    self.request_data.get('description') or None
+                )
+
+                self.success(
+                    data = { 'ticket_id': ticket_id },
+                    note = f'Ticket created. If this is a mistake, you have {revoke_time} seconds to remove it before it gets visible to the providers.'
+                )
+
+            else:
+                self.error(status_code = 403, error_code = ErrorCode.PERMISSION_DENIED, message = ErrorMessage.PERMISSION_DENIED)
 
         except ApplicationException as e:
             self.error(status_code = 400, error_code = e.code, message = e.message)

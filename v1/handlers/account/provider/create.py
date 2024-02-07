@@ -39,8 +39,6 @@ class CreateProviderAccountHandler(ProtectedHandler):
         if self.handle_post(self.required_fields) == False:
             return
 
-        print(self.request_data)
-
         try:
             # ensure that we have the proper permissions for this operation
             self.permission_service.can_create_account()

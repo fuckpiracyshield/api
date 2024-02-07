@@ -14,9 +14,11 @@ class PingHandler(RequestHandler):
     Handle simple pings to check the API availability.
     """
 
+    # let's be fun
     responses = [
         'Pong!',
-        'Do APIs dream of electric requests?'
+        'Do APIs dream of electric requests?',
+        'So long and thanks for all the requests'
     ]
 
     def get(self):

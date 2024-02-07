@@ -31,7 +31,24 @@ class RequestHandler(ResponseHandler):
         RateLimitInterceptor
     ]
 
+    ip_address = None
+
     async def prepare(self):
+        self.ip_address = self.request.remote_ip
+
+        # honor the IP passed via reverse proxy
+        if 'X-Forwarded-For' in self.request.headers:
+            # TODO: we need validation as this could be easily spoofed.
+
+            # we could have multiple IPs here
+            forwarded_ip_addresses = str(self.request.headers.get("X-Forwarded-For")).split(',')
+
+            # get only the forwarded client IP
+            self.ip_address = forwarded_ip_addresses[0]
+
+            # if any port is specified just ignore it and keep only the IP
+            self.ip_address.split(':')[0]
+
         await self.run_interceptors()
 
     async def run_interceptors(self):

@@ -57,7 +57,7 @@ class AuthenticationRefreshHandler(BaseHandler):
                 None,
                 authentication_refresh_access_token_service.execute,
                 refresh_token,
-                self.request.remote_ip
+                self.ip_address
             )
 
             # return the access_token
